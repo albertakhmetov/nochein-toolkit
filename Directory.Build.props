@@ -1,0 +1,43 @@
+<Project>
+    <PropertyGroup>
+        <VersionPrefix>0.0.0</VersionPrefix>
+        <VersionSuffix>dev</VersionSuffix>
+        <Copyright>© 2026, Albert Akhmetov</Copyright>
+        <Authors>Albert Akhmetov</Authors>
+        <Product>Nochein Toolkit</Product>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Platforms>x64</Platforms>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <BaseProjectName>$(MSBuildProjectName)</BaseProjectName>
+        <BaseProjectName Condition="$(MSBuildProjectName.EndsWith('.WinUI'))">$(MSBuildProjectName.Substring(0, $(MSBuildProjectName.LastIndexOf('.WinUI'))))</BaseProjectName>
+        <BaseProjectName Condition="$(MSBuildProjectName.EndsWith('.Tests'))">$(MSBuildProjectName.Substring(0, $(MSBuildProjectName.LastIndexOf('.Tests'))))</BaseProjectName>
+
+        <RootNamespace>$(BaseProjectName)</RootNamespace>
+
+        <OutputPath>..\..\target\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+        <PackageOutputPath>..\..\target\NuGet\</PackageOutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <Optimize>False</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <Optimize>True</Optimize>
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+</Project>

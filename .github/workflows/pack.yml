@@ -1,0 +1,49 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+    - v[0-9]+.**
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release]
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4.2.2
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4.1.0
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Set variables
+      shell: pwsh
+      run: |
+        $repoParts = "${{ github.repository }}".Split('/')
+        $owner = $repoParts[0]
+        echo "GITHUB_OWNER=$owner" >> $env:GITHUB_ENV
+      
+        $tag = "${{ github.ref_name }}"
+        $version = $tag -replace '^v', ''
+        echo "VERSION=$version" >> $env:GITHUB_ENV
+
+        echo "GitHub owner: $owner"
+        echo "Package version: $version"
+
+    - name: Add "github" source 
+      run: dotnet nuget add source --username ${{ env.GITHUB_OWNER }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_OWNER }}/index.json"
+
+    - name: Pack
+      run: dotnet pack ./ -c Release -p:PackageVersion=${{ env.VERSION }} -p:Version=${{ env.VERSION }}
+
+    - name: Publish to GitHub packages 
+      run: dotnet nuget push ${{ github.workspace }}\target\NuGet\*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
