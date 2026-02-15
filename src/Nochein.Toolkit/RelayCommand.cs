@@ -40,18 +40,17 @@ public sealed class RelayCommand : ICommand
 
     public event EventHandler? CanExecuteChanged;
 
-    public bool CanExecute(object? parameter)
-    {
-        return _canExecute is null || _canExecute(parameter);
-    }
+    public bool CanExecute(object? parameter) => _canExecute is null || _canExecute(parameter);
+
+    public void NotifyCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
     public void Execute(object? parameter)
     {
-        _action.Invoke(parameter);
-    }
+        if (!CanExecute(parameter))
+        {
+            return;
+        }
 
-    public void NotifyCanExecuteChanged()
-    {
-        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        _action.Invoke(parameter);
     }
 }

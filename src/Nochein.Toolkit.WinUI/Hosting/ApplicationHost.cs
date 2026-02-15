@@ -95,7 +95,7 @@ public sealed class ApplicationHost : IAsyncDisposable
             return _instance.SendAndRedirectAsync();
         }
 
-        var tcs = new TaskCompletionSource<bool>();
+        var tcs = new TaskCompletionSource();
         var uiThread = new Thread(async () =>
         {
             try
@@ -139,7 +139,7 @@ public sealed class ApplicationHost : IAsyncDisposable
                 tcs.TrySetException(ex);
             }
 
-            tcs.TrySetResult(true);
+            tcs.TrySetResult();
         });
 
         uiThread.SetApartmentState(ApartmentState.STA);

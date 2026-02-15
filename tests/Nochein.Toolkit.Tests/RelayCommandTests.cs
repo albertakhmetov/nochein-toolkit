@@ -52,6 +52,17 @@ public class RelayCommandTests
     }
 
     [Fact]
+    public void Execute_CanExecuteIsFalse_DoNotInvokeAction()
+    {
+        var invokes = new List<object?>();
+
+        var command = new RelayCommand(x => invokes.Add(x), _ => false);
+        command.Execute(null);
+
+        invokes.Should().BeEmpty();
+    }
+
+    [Fact]
     public void CanExecute_NotSet_ReturnsTrue()
     {
         var command = new RelayCommand(x => { });
