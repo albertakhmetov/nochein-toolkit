@@ -1,0 +1,8 @@
+RegisterClass
+UnregisterClass
+CreateWindowEx
+DestroyWindow
+DefWindowProc
+
+GetSystemMetrics
+SHChangeNotify

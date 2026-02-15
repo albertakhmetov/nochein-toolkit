@@ -1,4 +1,4 @@
-/*  Copyright � 2026, Albert Akhmetov <akhmetov@live.com>   
+﻿/*  Copyright © 2026, Albert Akhmetov <akhmetov@live.com>   
  *
  *  This file is part of Nochein Toolkit.
  *
@@ -16,27 +16,27 @@
  *  along with Nochein Toolkit. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
-namespace Nochein.Toolkit.Demo;
+namespace Nochein.Toolkit.Hosting;
 
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.UI.Xaml;
-using Nochein.Toolkit.Hosting;
+using System.Diagnostics;
+using System.Linq;
 
-public sealed class Program
+public sealed class ApplicationInfo
 {
-    public static async Task Main(string[] args)
-    {
-        await using var host = new ApplicationHost(ConfigureServices, singleInstance: true);
+    public required string AppUserModelId { get; init; }
 
-        await host.RunAsync();
-    }
+    public required FileInfo File { get; init; }
 
-    private static void ConfigureServices(IServiceCollection services)
-    {
-        services.AddApplicationInfo("Nochein.Toolkit.Demo");
+    public required DirectoryInfo UserDataDirectory { get; init; }
 
-        services.AddSingleton<Application, App>();
-    }
+    public string? LegalCopyright { get; init; }
+
+    public string? CompanyName { get; init; }
+
+    public string? ProductName { get; init; }
+
+    public string? ProductVersion { get; init; }
+
+    public string? ProductDescription { get; init; }
 }

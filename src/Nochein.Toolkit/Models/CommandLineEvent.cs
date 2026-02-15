@@ -1,4 +1,4 @@
-/*  Copyright � 2026, Albert Akhmetov <akhmetov@live.com>   
+﻿/*  Copyright © 2026, Albert Akhmetov <akhmetov@live.com>   
  *
  *  This file is part of Nochein Toolkit.
  *
@@ -16,27 +16,29 @@
  *  along with Nochein Toolkit. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
-namespace Nochein.Toolkit.Demo;
+namespace Nochein.Toolkit.Models;
 
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.UI.Xaml;
-using Nochein.Toolkit.Hosting;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
-public sealed class Program
+public sealed class CommandLineEvent
 {
-    public static async Task Main(string[] args)
+    [JsonConstructor]
+    public CommandLineEvent(DateTimeOffset timestamp, IImmutableList<string>? args)
     {
-        await using var host = new ApplicationHost(ConfigureServices, singleInstance: true);
-
-        await host.RunAsync();
+        Timestamp = timestamp;
+        Args = args?.ToImmutableArray() ?? [];
     }
 
-    private static void ConfigureServices(IServiceCollection services)
+    public CommandLineEvent(IEnumerable<string>? args)
     {
-        services.AddApplicationInfo("Nochein.Toolkit.Demo");
-
-        services.AddSingleton<Application, App>();
+        Timestamp = DateTimeOffset.Now;
+        Args = args?.ToImmutableArray() ?? [];
     }
+
+    public DateTimeOffset Timestamp { get; }
+
+    public IImmutableList<string> Args { get; }
 }

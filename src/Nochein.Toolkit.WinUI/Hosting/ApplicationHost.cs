@@ -29,17 +29,19 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
+using Nochein.Toolkit.Services;
 using Windows.Media.Protection.PlayReady;
 
 public sealed class ApplicationHost : IAsyncDisposable
 {
-    public ApplicationHost(Action<IServiceCollection> configureServices)
+    public ApplicationHost(Action<IServiceCollection> configureServices, bool singleInstance = false)
     {
         ArgumentNullException.ThrowIfNull(configureServices);
 
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddSingleton<IHostApplicationLifetime, ApplicationLifetime>();
+        serviceCollection.AddSingleton<IEventBus, EventBus>();
 
         serviceCollection.AddLogging(builder =>
         {
@@ -47,15 +49,24 @@ public sealed class ApplicationHost : IAsyncDisposable
             builder.AddProvider(NullLoggerProvider.Instance);
         });
 
+        if (singleInstance)
+        {
+            serviceCollection.AddHostedService<InstancePipeReceiverService>();
+        }
+
         configureServices(serviceCollection);
 
         Services = serviceCollection.BuildServiceProvider();
 
         _applicationLifetime = (ApplicationLifetime)Services.GetRequiredService<IHostApplicationLifetime>();
+        _instance = singleInstance
+            ? new Instance(Services.GetRequiredService<ApplicationInfo>().AppUserModelId)
+            : null;
         _logger = Services.GetRequiredService<ILogger<ApplicationHost>>();
     }
 
     private readonly ApplicationLifetime _applicationLifetime;
+    private readonly Instance? _instance;
     private readonly ILogger _logger;
 
     private Stack<IHostedService>? _runningServices;
@@ -78,6 +89,11 @@ public sealed class ApplicationHost : IAsyncDisposable
 
     public Task RunAsync()
     {
+        if (_instance?.IsCurrent is false)
+        {
+            return _instance.SendAndRedirectAsync();
+        }
+
         var tcs = new TaskCompletionSource<bool>();
         var uiThread = new Thread(async () =>
         {
@@ -87,7 +103,7 @@ public sealed class ApplicationHost : IAsyncDisposable
 
                 using var registration = _applicationLifetime.ApplicationStopping.Register(() => Application.Current?.Exit());
 
-                Application.Start(p =>
+                Application.Start(async _ =>
                 {
                     var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
@@ -103,7 +119,17 @@ public sealed class ApplicationHost : IAsyncDisposable
                         tcs.TrySetException(e.Exception);
                     };
 
-                    _ = StartAsync(CancellationToken.None);
+                    try
+                    {
+                        await StartAsync(CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogCritical(ex, "Unable to start background services");
+                        tcs.TrySetException(ex);
+
+                        Application.Current?.Exit();
+                    }
                 });
             }
             catch (Exception ex)
