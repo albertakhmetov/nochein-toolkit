@@ -57,7 +57,7 @@ internal class ApplicationLifetime : IHostApplicationLifetime
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while stopping the application.");
+                _logger.LogError(ex, "An error occurred while stopping the application");
             }
         }
     }
@@ -70,7 +70,7 @@ internal class ApplicationLifetime : IHostApplicationLifetime
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while starting the application.");
+            _logger.LogError(ex, "An error occurred while starting the application");
         }
     }
 
@@ -82,7 +82,7 @@ internal class ApplicationLifetime : IHostApplicationLifetime
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while stopping the application.");
+            _logger.LogError(ex, "An error occurred while stopping the application");
         }
     }
 }

@@ -73,7 +73,7 @@ internal sealed class InstancePipeReceiverService : BackgroundService
             }
             catch (IOException ex)
             {
-                _logger.LogWarning(ex, "Pipe connection broken, recreating.");
+                _logger.LogWarning(ex, "Pipe connection broken, recreating");
                 continue;
             }
 
@@ -90,12 +90,12 @@ internal sealed class InstancePipeReceiverService : BackgroundService
                 }
                 else
                 {
-                    _logger.LogWarning("Data can't be deserialized ({Data}).", receivedData);
+                    _logger.LogWarning("Data can't be deserialized ({Data})", receivedData);
                 }
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Error during receiving instance data.");
+                _logger.LogError(exception, "Error during receiving instance data");
 
                 continue;
             }
