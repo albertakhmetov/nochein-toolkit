@@ -41,6 +41,7 @@ public sealed class ApplicationHost : IAsyncDisposable
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddSingleton<IHostApplicationLifetime, ApplicationLifetime>();
+        serviceCollection.AddSingleton<SystemEnvironment>();
         serviceCollection.AddSingleton<IEventBus, EventBus>();
 
         serviceCollection.AddLogging(builder =>
