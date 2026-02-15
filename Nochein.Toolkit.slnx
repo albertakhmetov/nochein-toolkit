@@ -4,6 +4,11 @@
   </Configurations>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />
+  </Folder>  
+  <Folder Name="/examples/">
+    <Project Path="examples/Nochein.Toolkit.Demo/Nochein.Toolkit.Demo.csproj">
+      <Platform Project="x64" />
+    </Project>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Nochein.Toolkit.Tests/Nochein.Toolkit.Tests.csproj">
